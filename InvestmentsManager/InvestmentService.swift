@@ -14,7 +14,7 @@ class InvestmentService {
     public func createInvestment(_ investment: Investment, userId: String, completion: @escaping (Result<Void,Error>)->Void) {
         do {
             try db.collection("users").document(userId)
-                .collection("investments").document(investment.id.uuidString)
+                .collection("investments").document(investment.id!)
                 .setData(from: investment) { error in
                     if let error = error {
                         print(error.localizedDescription)
@@ -54,7 +54,7 @@ class InvestmentService {
     func updateInvestment(_ investment: Investment, userId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         do {
             try db.collection("users").document(userId)
-                .collection("investments").document(investment.id.uuidString)
+                .collection("investments").document(investment.id!)
                 .setData(from: investment) { error in
                     if let error = error {
                         print(error.localizedDescription)
