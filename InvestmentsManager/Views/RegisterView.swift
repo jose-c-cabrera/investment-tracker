@@ -46,7 +46,7 @@ struct RegisterView: View {
                 }
 
                 guard Validators.isValidPassword(password) else {
-                    self.errorMessage = "Invalid Passwrd"
+                    self.errorMessage = "Invalid Password"
                     return
                 }
 
@@ -57,7 +57,7 @@ struct RegisterView: View {
 
                 // auth.sign up
 
-                auth.signUp(email: email, passwrod: password, displayName: displayName) { result in
+                auth.signUp(email: email, password: password, displayName: displayName) { result in
                     switch result {
                     case .success(let success):
                         self.errorMessage = nil

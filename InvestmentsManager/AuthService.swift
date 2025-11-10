@@ -16,18 +16,15 @@ class AuthService: ObservableObject {
     
     
     static let shared = AuthService() // Singleton Pattern
-    
-    
     @Published var currentUser: AppUser?
     
     // db reference
     private let db = Firestore.firestore()
     private let auth = Auth.auth()
     
-    func signUp(email: String, passwrod: String, displayName: String, completion: @escaping (Result<AppUser, Error>) -> Void) {
-        
-        
-        auth.createUser(withEmail: email, password: passwrod) { result, error in
+    func signUp(email: String, password: String, displayName: String, completion: @escaping (Result<AppUser, Error>) -> Void) {
+    
+        auth.createUser(withEmail: email, password: password) { result, error in
             if let error = error {
                 print(error.localizedDescription)
                 return completion(.failure(error))
@@ -39,7 +36,6 @@ class AuthService: ObservableObject {
             }
             
             let uid = user.uid
-            
             let appUser = AppUser(id: uid, email: email, displayName: displayName)
             
             do {
@@ -66,14 +62,14 @@ class AuthService: ObservableObject {
     }
     
     
-    func signIn(email: String, password: String, completion: @escaping (Result<AppUser, Error>)-> Void) {
+    func logIn(email: String, password: String, completion: @escaping (Result<AppUser, Error>)-> Void) {
         auth.signIn(withEmail: email, password: password) { result, error in
             if let error = error {
                 completion(.failure(error))
             } else if let user = result?.user {
                 
                 // fetch the user
-                self.getCurrentAppUser { res in
+                self.fetchCurrentUser { res in
                     switch res {
                         
                     case .failure(let failure):
@@ -87,7 +83,8 @@ class AuthService: ObservableObject {
                             let email = result?.user.email ?? "No Email Found"
                             let name = result?.user.displayName ?? "No Name Found"
                             let appUser = AppUser(email: email, displayName: name)
-                            
+                            print("Attempting login with email: '\(email)', password length: \(password.count)")
+
                             // we will push a miniaml record object to the firestore
                             do {
                                 try self.db.collection("users").document(user.uid).setData(from: appUser) {
@@ -116,7 +113,7 @@ class AuthService: ObservableObject {
     
     // fetch current user
     
-    func getCurrentAppUser(completion: @escaping (Result<AppUser?, Error>)-> Void){
+    func fetchCurrentUser(completion: @escaping (Result<AppUser?, Error>)-> Void){
         guard let uid = auth.currentUser?.uid else {
             DispatchQueue.main.async {
                 self.currentUser = nil
@@ -154,7 +151,7 @@ class AuthService: ObservableObject {
             if let error = error {
                 return completion(.failure(error))
             }else {
-                self.getCurrentAppUser { _ in
+                self.fetchCurrentUser { _ in
                     completion(.success(()))
                 }
             }

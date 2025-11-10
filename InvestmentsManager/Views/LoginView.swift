@@ -20,7 +20,6 @@ struct LoginView: View {
         displayLoginForm()
     }
     
-    @ViewBuilder
     private func displayLoginForm() -> some View{
         Form{
             Section("Login") {
@@ -42,11 +41,8 @@ struct LoginView: View {
             Button("Login"){
                 handleAuthentication()
             }
-            
-            
-            
+            .disabled(email.isEmpty || password.isEmpty)
         }
-        .disabled(email.isEmpty || password.isEmpty)
     }
 
 
@@ -63,7 +59,7 @@ struct LoginView: View {
         }
         
         // auth.sign up
-        auth.login(email: email, password: password) { result in
+        auth.logIn(email: email, password: password) { result in
             switch result {
             case .success:
                 errorMessage = nil

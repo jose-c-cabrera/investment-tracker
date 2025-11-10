@@ -13,32 +13,27 @@ struct ContentView: View {
     @StateObject private var auth = AuthService.shared
     @State private var isLoaded = false
     
-    
     var body: some View {
-        Group{
-            
-            if !isLoaded{
+        Group {
+            if !isLoaded {
                 ProgressView()
                     .onAppear {
-                        auth.getCurrentAppUser{ _ in
+                        auth.fetchCurrentUser { _ in
                             isLoaded = true
                         }
                     }
-            }else if auth.currentUser ==  nil {
+            } else if auth.currentUser == nil {
                 // Auth page
                 AuthGate()
             } else {
-                // Profile Page
-                ProfileView()
+                // UPDATED: Show MainTabView instead of ProfileView
+                DashboardView()
             }
-            
         }
-        
     }
 }
 
 #Preview {
     ContentView()
 }
-
  

@@ -10,7 +10,6 @@ import FirebaseFirestore
 
 
 struct AppUser: Identifiable, Codable {
-    
     @DocumentID var id: String? // we will use FirebaseAuth.User.uid
     let email: String
     var displayName: String

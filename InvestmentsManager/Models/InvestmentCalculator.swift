@@ -43,6 +43,7 @@ class InvestmentCalculator {
         for year in 1...investment.years {
             let tempInvestment = Investment (
                 id: investment.id,
+                userId: investment.userId,
                 name: investment.name,
                 initialAmount: investment.initialAmount,
                 interestRate: investment.interestRate,

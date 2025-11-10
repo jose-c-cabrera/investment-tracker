@@ -11,16 +11,26 @@ class InvestmentService {
     static let shared = InvestmentService()
     private let db = Firestore.firestore()
 
-    public func createInvestment(_ investment: Investment, userId: String, completion: @escaping (Result<Void,Error>)->Void) {
+    public func createInvestment(_ investment: Investment, completion: @escaping (Result<Investment,Error>)->Void) {
+        var newInvestment = investment
+        let userId = investment.userId
+        if newInvestment.id == nil {
+            newInvestment.id = UUID().uuidString
+        }
+        
+        guard let investmentId = newInvestment.id else {
+            return completion(.failure(SimpleError("Failed to create a new InvestmentID")))
+        }
+        
         do {
             try db.collection("users").document(userId)
-                .collection("investments").document(investment.id!)
+                .collection("investments").document(newInvestment.id!)
                 .setData(from: investment) { error in
                     if let error = error {
                         print(error.localizedDescription)
                         return completion(.failure(error))
                     }
-                    completion(.success((())))
+                    completion(.success(newInvestment))
                     
                 }
         } catch {
@@ -51,7 +61,12 @@ class InvestmentService {
 
     }
 
-    func updateInvestment(_ investment: Investment, userId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func updateInvestment(_ investment: Investment, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let investmentId = investment.id else {
+            return completion(.failure(SimpleError("Investment ID is required")))
+        }
+        
+        let userId = investment.userId
         do {
             try db.collection("users").document(userId)
                 .collection("investments").document(investment.id!)
@@ -69,18 +84,22 @@ class InvestmentService {
         }
         
     }
-    func deleteInvestment(withId id: String, userId: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        db.collection("users").document(userId)
-            .collection("investments").document(id).delete { error in
-                if let error = error {
-                    print(error.localizedDescription)
-                    return completion(.failure(error))
-                }
-                
-                completion(.success(()))
-            }
-    }
-
+    func deleteInvestment(_ investment: Investment, completion: @escaping (Result<Void, Error>) -> Void) {
+         guard let investmentId = investment.id else {
+             return completion(.failure(SimpleError("Investment ID is required")))
+         }
+         
+         let userId = investment.userId
+         
+         db.collection("users").document(userId)
+             .collection("investments").document(investmentId).delete { error in
+                 if let error = error {
+                     print(error.localizedDescription)
+                     return completion(.failure(error))
+                 }
+                 completion(.success(()))
+             }
+     }
 
 }
 

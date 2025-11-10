@@ -17,7 +17,7 @@ struct ProfileView: View {
             Section("Profile") {
                 Text("Email: \(auth.currentUser?.email ?? "-")")
                 Text("Display Name: \(auth.currentUser?.displayName ?? "-")")
-                Text("Active: \(auth.currentUser?.isActive == true ? "Yes" : "No")")
+
             }
  
             Section("Update Display Name") {
@@ -58,7 +58,7 @@ struct ProfileView: View {
             }
         }
         .onAppear {
-            auth.fetchCurrentAppUser { _ in }
+            auth.fetchCurrentUser { _ in }
         }
     }
 }
