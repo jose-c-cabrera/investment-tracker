@@ -39,13 +39,11 @@ struct InvestmentDetailView: View {
             VStack(spacing: 20) {
                 summaryCard
                 
-                // growth chart with n years of investment
+                growthChart
                 
-                // general detail sections with type, initial amt, interest rt,
-                // investment period
+                detailsSection
                 
-                
-                // chart with breakdown years of investment (got)
+                yearlyBreakdownSection
             }
             .padding()
         }
@@ -153,8 +151,105 @@ struct InvestmentDetailView: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
     }
-        
-        
+    
+    private var growthChart: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Growth Over Time")
+                .font(.headline)
+            
+            Chart {
+                ForEach(Array(yearlyGrowth.enumerated()), id: \.offset) { index, value in
+                    LineMark(
+                        x: .value("Year", index + 1),
+                        y: .value("Value", value)
+                    )
+                    .foregroundStyle(.green)
+                    .interpolationMethod(.catmullRom)
+                    
+                    AreaMark(
+                        x: .value("Year", index + 1),
+                        y: .value("Value", value)
+                    )
+                    .foregroundStyle(
+                        .linearGradient(
+                            colors: [.green.opacity(0.3), .green.opacity(0.05)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .interpolationMethod(.catmullRom)
+                }
+            }
+            .frame(height: 200)
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 5))
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisValueLabel {
+                        if let doubleValue = value.as(Double.self) {
+                            Text(doubleValue, format: .currency(code: "USD").precision(.fractionLength(0)))
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+    }
+    
+    private var detailsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Investment Details")
+                .font(.headline)
+            
+            DetailRow(label: "Type", value: investment.investmentType.rawValue.capitalized)
+            DetailRow(label: "Initial Amount", value: investment.initialAmount, format: .currency(code: "USD"))
+            DetailRow(label: "Interest Rate", value: "\(String(format: "%.2f", investment.interestRate))%")
+            DetailRow(label: "Investment Period", value: "\(investment.years) years")
+            
+            if let monthly = investment.monthlyContribution, monthly > 0 {
+                DetailRow(label: "Monthly Contribution", value: monthly, format: .currency(code: "USD"))
+            }
+            
+            if investment.investmentType == .savingsAccount || investment.investmentType == .bonds {
+                DetailRow(label: "Compound Frequency", value: compoundFrequencyText)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+    }
+    
+    private var yearlyBreakdownSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Yearly Breakdown")
+                .font(.headline)
+            
+            ForEach(Array(yearlyGrowth.enumerated()), id: \.offset) { index, value in
+                HStack {
+                    Text("Year \(index + 1)")
+                        .font(.subheadline)
+                    
+                    Spacer()
+                    
+                    Text(value, format: .currency(code: "USD"))
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                .padding(.vertical, 4)
+                
+                if index < yearlyGrowth.count - 1 {
+                    Divider()
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+    }
+    
     private var typeIcon: String {
         switch investment.investmentType {
         case .savingsAccount: return "banknote"
@@ -171,6 +266,14 @@ struct InvestmentDetailView: View {
         }
     }
     
+    private var compoundFrequencyText: String {
+        switch investment.compoundFrequency {
+        case .monthly: return "Monthly"
+        case .quarterly: return "Quarterly"
+        case .semiAnnually: return "Semi-Annually"
+        case .annually: return "Annually"
+        }
+    }
     
     private func deleteInvestment() {
         InvestmentService.shared.deleteInvestment(investment) { result in
@@ -185,6 +288,34 @@ struct InvestmentDetailView: View {
     }
 }
 
+struct DetailRow: View {
+    let label: String
+    let value: String
+    
+    init(label: String, value: String) {
+        self.label = label
+        self.value = value
+    }
+    
+    init(label: String, value: Double, format: FloatingPointFormatStyle<Double>.Currency) {
+        self.label = label
+        self.value = value.formatted(format)
+    }
+    
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            Text(value)
+                .font(.subheadline)
+                .fontWeight(.medium)
+        }
+    }
+}
 
 #Preview {
     NavigationStack {
@@ -192,11 +323,11 @@ struct InvestmentDetailView: View {
             investment: Investment(
                 userId: "preview-user-id",
                 name: "Sample Investment",
-                initialAmount: 0,
+                initialAmount: 10000,
                 interestRate: 7.5,
                 years: 10,
                 investmentType: .stocks,
-                monthlyContribution: 0,
+                monthlyContribution: 500,
                 compoundFrequency: .monthly
             ),
             onDelete: {}

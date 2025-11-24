@@ -23,10 +23,8 @@ struct ContentView: View {
                         }
                     }
             } else if auth.currentUser == nil {
-                // Auth page
                 AuthGate()
             } else {
-                // UPDATED: Show MainTabView instead of ProfileView
                 DashboardView()
             }
         }

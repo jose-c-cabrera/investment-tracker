@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
+
 public struct Investment: Identifiable, Codable {
     @DocumentID public var id: String?
     public var userId:String
@@ -18,6 +19,7 @@ public struct Investment: Identifiable, Codable {
     public var investmentType: InvestmentType
     public var monthlyContribution: Double?
     public var compoundFrequency: CompoundFrequency
+    public var selectedStockSymbol: String?
     
     public init(
          id: String? = nil,
@@ -28,7 +30,8 @@ public struct Investment: Identifiable, Codable {
          years: Int,
          investmentType: InvestmentType,
          monthlyContribution: Double? = nil,
-         compoundFrequency: CompoundFrequency = .monthly
+         compoundFrequency: CompoundFrequency = .monthly,
+         selectedStockSymbol: String? = nil,
      ) {
          self.id = id
          self.userId = userId
@@ -39,6 +42,7 @@ public struct Investment: Identifiable, Codable {
          self.investmentType = investmentType
          self.monthlyContribution = monthlyContribution
          self.compoundFrequency = compoundFrequency
+         self.selectedStockSymbol = selectedStockSymbol
      }
  }
 

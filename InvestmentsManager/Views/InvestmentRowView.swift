@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct InvestmentRowView: View {
+    
+    let investment: Investment
+    
     private var typeColor: Color {
         switch investment.investmentType {
         case .savingsAccount: return .blue
@@ -16,19 +19,23 @@ struct InvestmentRowView: View {
         }
     }
     
-    let investment: Investment
     private var futureValue: Double {
         InvestmentCalculator.calculateFutureValue(for: investment)
     }
+    
     private var totalInvested: Double {
-        let monthlyTotal = (investment.monthlyContribution ?? 0) * Double(investment.years) * 12
+        let monthly = (investment.monthlyContribution ?? 0)
+        let monthlyTotal = monthly * Double(investment.years) * 12
         return investment.initialAmount + monthlyTotal
     }
+    
     private var gain: Double {
         futureValue - totalInvested
     }
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 10) {
+            
             HStack {
                 Text(investment.name)
                     .font(.headline)
@@ -36,51 +43,52 @@ struct InvestmentRowView: View {
                 Spacer()
                 
                 Text(investment.investmentType.rawValue.capitalized)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
+                    .font(.caption2)
+                    .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(typeColor.opacity(0.2))
+                    .background(typeColor.opacity(0.15))
                     .foregroundColor(typeColor)
                     .cornerRadius(8)
             }
             
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text("Initial: \(investment.initialAmount, format: .currency(code: "CAD"))")
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                     
-                    if let monthly = investment.monthlyContribution, monthly > 0 {
-                        Text("+ \(monthly, format: .currency(code: "CAD"))/monthly")
+                    if let m = investment.monthlyContribution, m > 0 {
+                        Text("Monthly: \(m, format: .currency(code: "CAD"))")
                             .font(.caption)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                     }
                 }
                 
                 Spacer()
                 
-                VStack(alignment: .trailing, spacing: 4) {
+                VStack(alignment: .trailing, spacing: 2) {
                     Text(futureValue, format: .currency(code: "CAD"))
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                    
-                    Text("+ \(gain, format: .currency(code: "CAD"))")
+                    Text("\(gain >= 0 ? "+" : "")\(gain, format: .currency(code: "CAD"))")
                         .font(.caption)
-                        .foregroundColor(.green)
+                        .foregroundColor(gain >= 0 ? .green : .red)
                 }
             }
             
-            HStack {
-                Text("\(String(format: "%.1f", investment.interestRate))% • \(investment.years) years")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
+            Text("\(String(format: "%.1f", investment.interestRate))% · \(investment.years) years")
+                .font(.caption2)
+                .foregroundColor(.secondary)
         }
-        .padding(.horizontal, 25)
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .padding(.vertical, 4)
+        .padding(.horizontal)
     }
-    
- 
 }
+
 
 #Preview {
     InvestmentRowView(investment: Investment(
