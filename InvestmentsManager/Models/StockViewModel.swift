@@ -14,7 +14,7 @@ class StockViewModel: ObservableObject {
     
     @MainActor
     func fetchHistoricalData(for symbol: String) async {
-        let apiKey = "DFM2VEU2S3YD4XTS"
+        let apiKey = APIKeys.alphaVantage
         let url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=\(symbol)&apikey=\(apiKey)"
 
         guard let response: AlphaVantageDailyResponse = await WebService().downloadData(fromUrl: url) else {

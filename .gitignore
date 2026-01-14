@@ -32,3 +32,4 @@ GoogleService-Info.plist
 # API Keys and Secrets
 Config.swift
 Secrets.swift
+APIKeys.swift
