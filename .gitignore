@@ -23,7 +23,7 @@ Podfile.lock
 .swiftpm/
 .build/
 
-# Firebase config (IMPORTANT!)
+# Firebase config
 GoogleService-Info.plist
 
 # macOS
