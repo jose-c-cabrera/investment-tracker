@@ -51,10 +51,11 @@ The project follows the MVVM (Model-View-ViewModel) pattern and utilizes modern 
 
 4. **API Configuration:**
     The project requires an Alpha Vantage API key to fetch stock data. Create a file named APIKeys.swift (or similar) and ensure the StockViewModel has access to a valid key:
-   ```swift
+   ```
    struct APIKeys {
-    static let alphaVantage = "YOUR_API_KEY_HERE"}
-   ´´´
+    static let alphaVantage = "YOUR_API_KEY_HERE"
+   }
+   ```
 5. **Build and Run:**
     Select your target simulator or device and press Cmd + R.
 
