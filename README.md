@@ -54,7 +54,7 @@ The project follows the MVVM (Model-View-ViewModel) pattern and utilizes modern 
    ```swift
    struct APIKeys {
     static let alphaVantage = "YOUR_API_KEY_HERE"
-    }```
+    }´´´
 5. **Build and Run:**
     Select your target simulator or device and press Cmd + R.
 
